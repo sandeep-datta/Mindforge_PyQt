@@ -6,21 +6,24 @@ from typing import List
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, \
     QHBoxLayout, QVBoxLayout, QSizePolicy, QScrollArea
 from PyQt5.QtGui import QIcon, QPaintEvent, QPainter, QPen, QPainterPath
-from PyQt5.QtCore import Qt, QPoint
+from PyQt5.QtCore import Qt, QPoint, QRect
 
 root_tree = ["Root node",
-                [["Child Node1"],
+                [["Child Node1",
+                    [["Child Node1.1"],
+                     ["Child Node1.2"]]],
                  ["Child Node2"]]]
 
 
 class NodeWidget(QWidget):
+
     def __init__(self, node_tree):
         super(NodeWidget, self).__init__()
         self.lblRoot = QLabel(node_tree[0])
         self.vboxChildren = QVBoxLayout()
         self.children: List[NodeWidget] = []
         self.blackPen = QPen(Qt.black, 2)
-        self.redPen = QPen(Qt.red, 4)
+        self.redPen = QPen(Qt.red, 1)
         self.initUi(node_tree)
 
     def initUi(self, node_tree):
@@ -63,6 +66,7 @@ class NodeWidget(QWidget):
 
             painter.drawLine(rect.bottomLeft(), p)
 
+            # Draw Bezier curves to the child nodes
             for child in self.children:
                 childBottomLeft : QPoint = child.mapToParent(child.lblRoot.geometry().bottomLeft())
                 childBottomLeft += QPoint(0, 2)
@@ -81,8 +85,6 @@ class NodeWidget(QWidget):
                 painter.drawPath(path)
 
 
-
-
 class MainWindow(QMainWindow):
 
     def __init__(self):
@@ -94,9 +96,13 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('Mindforge')
         self.setWindowIcon(QIcon('icons/engineering.svg'))
         self.statusBar().showMessage('New mindmap')
+
+        nw = NodeWidget(root_tree)
+
         sa = QScrollArea()
-        w = NodeWidget(root_tree)
-        sa.setWidget(w)
+        sa.setAlignment(Qt.AlignCenter)
+        sa.setWidget(nw)
+
         self.setCentralWidget(sa)
         self.show()
 
