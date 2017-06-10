@@ -5,7 +5,7 @@ from typing import List
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, \
     QHBoxLayout, QVBoxLayout, QSizePolicy, QScrollArea
-from PyQt5.QtGui import QIcon, QPaintEvent, QPainter, QPen, QPainterPath
+from PyQt5.QtGui import QIcon, QPaintEvent, QPainter, QPen, QPainterPath, QPalette
 from PyQt5.QtCore import Qt, QPoint, QRect
 
 root_tree = ["Root node",
@@ -22,8 +22,8 @@ class NodeWidget(QWidget):
         self.lblRoot = QLabel(node_tree[0])
         self.vboxChildren = QVBoxLayout()
         self.children: List[NodeWidget] = []
-        self.blackPen = QPen(Qt.black, 2)
-        self.redPen = QPen(Qt.red, 1)
+        self.linePen = QPen(Qt.gray, 2)
+        self.debugPen = QPen(Qt.red, 1)
         self.initUi(node_tree)
 
     def initUi(self, node_tree):
@@ -54,7 +54,7 @@ class NodeWidget(QWidget):
     def paintEvent(self, event: QPaintEvent):
         with QPainter(self) as painter:
             painter.setRenderHint(QPainter.Antialiasing, True)
-            painter.setPen(self.blackPen)
+            painter.setPen(self.linePen)
 
             rect = self.lblRoot.geometry().translated(0, 2)
 
@@ -95,6 +95,7 @@ class MainWindow(QMainWindow):
         self.setGeometry(300, 300, 300, 220)
         self.setWindowTitle('Mindforge')
         self.setWindowIcon(QIcon('icons/engineering.svg'))
+        self.setBackgroundColor(Qt.white)
         self.statusBar().showMessage('New mindmap')
 
         nw = NodeWidget(root_tree)
@@ -105,6 +106,11 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(sa)
         self.show()
+
+    def setBackgroundColor(self, color):
+        p = QPalette(self.palette())
+        p.setColor(QPalette.Background, color)
+        self.setPalette(p)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
